@@ -11,7 +11,6 @@
 				url: 'http://192.168.1.40:1337/menu.json',
 				type: 'GET',
 				success: function(data){
-					console.log('success');
 					app.displayMenu(data);
 				},
 				error: function(){
@@ -27,7 +26,6 @@
 				url: 'http://192.168.1.40:1337' + page,
 				type: 'GET',
 				success: function(data){
-					console.log('success');
 					this.article = data;
 					app.display(app.transformMd(data));
 				},
@@ -53,9 +51,8 @@
 			for(let i = 0; i < app.menu.length ; i++){
 				$('#menu').append('<div class="ui column"><button id="btn'+i+'">' + app.menu[i].title +'</button></div>');
 				$('#btn'+i+'').on('click', function(){
-					app.getFile(app.menu[i].path);i 
+					app.getFile(app.menu[i].path);
 				});
-				console.log('listener ' + i);
 			}
 		}
 	};
