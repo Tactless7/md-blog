@@ -1,6 +1,7 @@
 (function(){
 	"use strict";
 	var app = {
+		menu: null,
 		article: null,
 		init:function(){
 			this.getMenu();
@@ -12,8 +13,6 @@
 				success: function(data){
 					console.log('success');
 					app.displayMenu(data);
-					console.log(data.menu[0].title);
-					console.log(data.menu[0].path);
 				},
 				error: function(){
 					console.log('error JSON');
@@ -23,14 +22,14 @@
 				}
 			});
 		},
-		getAlice: function(){
+		getFile: function(page){
 			$.ajax({
-				url: 'http://192.168.1.40:1337/alice.md',
+				url: 'http://192.168.1.40:1337' + page,
 				type: 'GET',
 				success: function(data){
 					console.log('success');
 					this.article = data;
-					app.displayAlice(app.transformMd(data));
+					app.display(app.transformMd(data));
 				},
 				error: function(){
 					console.log('error');
@@ -46,12 +45,17 @@
 			html = converter.makeHtml(text);
 			return html;
 		},
-		displayAlice: function(html){
+		display: function(html){
 			$('#md').html(html);
 		},
 		displayMenu: function(data){
-			for(var i = 0; i < data.menu.length ; i++){
-				$('#menu').append('<a href="192.168.1.40:1337' + data.menu[i].path + '"><button>' + data.menu[i].title +'</button></a>');
+			app.menu = data.menu;
+			for(let i = 0; i < app.menu.length ; i++){
+				$('#menu').append('<div class="ui column"><button id="btn'+i+'">' + app.menu[i].title +'</button></div>');
+				$('#btn'+i+'').on('click', function(){
+					app.getFile(app.menu[i].path);i 
+				});
+				console.log('listener ' + i);
 			}
 		}
 	};
