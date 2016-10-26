@@ -3,56 +3,45 @@
 	var app = {
 		menu: null,
 		article: null,
+		config: {},
 		init:function(){
-			this.getMenu();
+			this.config = window.appConfig;
+			var self = this;
+			$('#menu').on('click', 'a', function(event){
+				event.preventDefault();
+				self.getFile($(this).attr('href'));
+				return false;
+			});
+			this.get('/menu.json', this.displayMenu.bind(this));
 		},
-		getMenu: function(){
+		get: function(path, cb){
 			$.ajax({
-				url: 'http://192.168.1.40:1337/menu.json',
+				url: this.config.url + path,
 				type: 'GET',
-				success: function(data){
-					app.displayMenu(data);
-				},
+				success: cb,
 				error: function(){
 					console.log('error JSON');
-				},
-				complete: function(){
-					console.log('complete');
 				}
 			});
 		},
 		getFile: function(page){
-			$.ajax({
-				url: 'http://192.168.1.40:1337' + page,
-				type: 'GET',
-				success: function(data){
-					this.article = data;
-					app.display(app.transformMd(data));
-				},
-				error: function(){
-					console.log('error');
-				},
-				complete: function(){
-					console.log('complete');
-				}
-			});
-
+			this.get(page, this.displayFile.bind(this));
+		},
+		displayFile: function(data){
+			this.article = data;
+			app.transformMd(data);
 		},
 		transformMd: function(text){
-			var converter = new showdown.Converter(),
-			html = converter.makeHtml(text);
-			return html;
-		},
-		display: function(html){
+			var converter = new showdown.Converter();
+			var html = converter.makeHtml(text);
+			
 			$('#md').html(html);
 		},
 		displayMenu: function(data){
-			app.menu = data.menu;
-			for(let i = 0; i < app.menu.length ; i++){
-				$('#menu').append('<div class="ui column"><button id="btn'+i+'">' + app.menu[i].title +'</button></div>');
-				$('#btn'+i+'').on('click', function(){
-					app.getFile(app.menu[i].path);
-				});
+			this.menu = data.menu;
+			for(var i = 0; i < this.menu.length ; i++){
+				$('#menu').append('<a href="' + this.menu[i].path +'">' + this.menu[i].title +'</a>');
+				
 			}
 		}
 	};
